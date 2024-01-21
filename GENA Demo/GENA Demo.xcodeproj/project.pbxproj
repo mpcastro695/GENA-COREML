@@ -1,0 +1,357 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E83186BA2B5DCB23001573DD /* GENA.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = E83186B92B5DCB23001573DD /* GENA.mlpackage */; };
+		E86D328229EA1FC100B6A880 /* GENA_DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E86D328129EA1FC100B6A880 /* GENA_DemoApp.swift */; };
+		E86D328629EA1FC200B6A880 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E86D328529EA1FC200B6A880 /* Assets.xcassets */; };
+		E86D328929EA1FC200B6A880 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E86D328829EA1FC200B6A880 /* Preview Assets.xcassets */; };
+		E86D329129EA1FE900B6A880 /* FeatureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E86D329029EA1FE900B6A880 /* FeatureView.swift */; };
+		E86D329929EA242B00B6A880 /* vocab.json in Resources */ = {isa = PBXBuildFile; fileRef = E86D329829EA242B00B6A880 /* vocab.json */; };
+		E86D32B02A00E06900B6A880 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E86D32AF2A00E06900B6A880 /* ContentView.swift */; };
+		E88ADDEE2B4111D400C28A52 /* BPTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88ADDED2B4111D400C28A52 /* BPTokenizer.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		E83186B92B5DCB23001573DD /* GENA.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = GENA.mlpackage; sourceTree = "<group>"; };
+		E86D327E29EA1FC100B6A880 /* GENA Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GENA Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E86D328129EA1FC100B6A880 /* GENA_DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GENA_DemoApp.swift; sourceTree = "<group>"; };
+		E86D328529EA1FC200B6A880 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E86D328829EA1FC200B6A880 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		E86D328A29EA1FC200B6A880 /* GENA_Demo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GENA_Demo.entitlements; sourceTree = "<group>"; };
+		E86D329029EA1FE900B6A880 /* FeatureView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeatureView.swift; sourceTree = "<group>"; };
+		E86D329829EA242B00B6A880 /* vocab.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = vocab.json; sourceTree = "<group>"; };
+		E86D32AF2A00E06900B6A880 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E88ADDED2B4111D400C28A52 /* BPTokenizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BPTokenizer.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E86D327B29EA1FC100B6A880 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E86D327529EA1FC100B6A880 = {
+			isa = PBXGroup;
+			children = (
+				E86D328029EA1FC100B6A880 /* GENA Demo */,
+				E86D327F29EA1FC100B6A880 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E86D327F29EA1FC100B6A880 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E86D327E29EA1FC100B6A880 /* GENA Demo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E86D328029EA1FC100B6A880 /* GENA Demo */ = {
+			isa = PBXGroup;
+			children = (
+				E83186B92B5DCB23001573DD /* GENA.mlpackage */,
+				E88ADDED2B4111D400C28A52 /* BPTokenizer.swift */,
+				E86D328129EA1FC100B6A880 /* GENA_DemoApp.swift */,
+				E86D329029EA1FE900B6A880 /* FeatureView.swift */,
+				E86D32AF2A00E06900B6A880 /* ContentView.swift */,
+				E86D329829EA242B00B6A880 /* vocab.json */,
+				E86D328529EA1FC200B6A880 /* Assets.xcassets */,
+				E86D328A29EA1FC200B6A880 /* GENA_Demo.entitlements */,
+				E86D328729EA1FC200B6A880 /* Preview Content */,
+			);
+			path = "GENA Demo";
+			sourceTree = "<group>";
+		};
+		E86D328729EA1FC200B6A880 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				E86D328829EA1FC200B6A880 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E86D327D29EA1FC100B6A880 /* GENA Demo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E86D328D29EA1FC200B6A880 /* Build configuration list for PBXNativeTarget "GENA Demo" */;
+			buildPhases = (
+				E86D327A29EA1FC100B6A880 /* Sources */,
+				E86D327B29EA1FC100B6A880 /* Frameworks */,
+				E86D327C29EA1FC100B6A880 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "GENA Demo";
+			productName = "GENA Demo";
+			productReference = E86D327E29EA1FC100B6A880 /* GENA Demo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E86D327629EA1FC100B6A880 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1420;
+				LastUpgradeCheck = 1420;
+				TargetAttributes = {
+					E86D327D29EA1FC100B6A880 = {
+						CreatedOnToolsVersion = 14.2;
+					};
+				};
+			};
+			buildConfigurationList = E86D327929EA1FC100B6A880 /* Build configuration list for PBXProject "GENA Demo" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E86D327529EA1FC100B6A880;
+			productRefGroup = E86D327F29EA1FC100B6A880 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E86D327D29EA1FC100B6A880 /* GENA Demo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E86D327C29EA1FC100B6A880 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E86D328929EA1FC200B6A880 /* Preview Assets.xcassets in Resources */,
+				E86D329929EA242B00B6A880 /* vocab.json in Resources */,
+				E86D328629EA1FC200B6A880 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E86D327A29EA1FC100B6A880 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E86D329129EA1FE900B6A880 /* FeatureView.swift in Sources */,
+				E86D32B02A00E06900B6A880 /* ContentView.swift in Sources */,
+				E83186BA2B5DCB23001573DD /* GENA.mlpackage in Sources */,
+				E88ADDEE2B4111D400C28A52 /* BPTokenizer.swift in Sources */,
+				E86D328229EA1FC100B6A880 /* GENA_DemoApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		E86D328B29EA1FC200B6A880 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		E86D328C29EA1FC200B6A880 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		E86D328E29EA1FC200B6A880 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "GENA Demo/GENA_Demo.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"GENA Demo/Preview Content\"";
+				DEVELOPMENT_TEAM = 8LW84PBM34;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.martincastro.GENA-Demo";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		E86D328F29EA1FC200B6A880 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "GENA Demo/GENA_Demo.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"GENA Demo/Preview Content\"";
+				DEVELOPMENT_TEAM = 8LW84PBM34;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.martincastro.GENA-Demo";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E86D327929EA1FC100B6A880 /* Build configuration list for PBXProject "GENA Demo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E86D328B29EA1FC200B6A880 /* Debug */,
+				E86D328C29EA1FC200B6A880 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E86D328D29EA1FC200B6A880 /* Build configuration list for PBXNativeTarget "GENA Demo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E86D328E29EA1FC200B6A880 /* Debug */,
+				E86D328F29EA1FC200B6A880 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E86D327629EA1FC100B6A880 /* Project object */;
+}
