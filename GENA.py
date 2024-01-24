@@ -3,28 +3,24 @@ from transformers import AutoTokenizer
 import coremltools as ct
 import numpy as np
 
-from BertANE.src.modeling_bert import BertForSequenceClassification
-from BertANE.BertANE import BertForSequenceClassificationANE
-from BertANE.WeightUtils import linear_to_conv2d
+from src.modeling_bert import BertForSequenceClassification
+from BertANE import BertForSequenceClassificationANE
 
 import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-# 1. Load the model and tokenizer from Huggingface's Model Hub
+# 1. Build the BERT model and load pre-trained weights and tokenizer from Huggingface's Model Hub
 tokenizer = AutoTokenizer.from_pretrained('AIRI-Institute/gena-lm-bert-base')
 torch_Model = BertForSequenceClassification.from_pretrained('AIRI-Institute/gena-lm-bert-base', return_dict=False).eval()
 print(torch_Model.modules)
 
-# 2. Instantiate an ANE optimized model using the base model's configuration
+# 2. Instantiate an ANE optimized model with the base model's configuration
 optimized_model = BertForSequenceClassificationANE(torch_Model.config).eval()
 print(optimized_model.modules)
+optimized_model.load_state_dict(torch_Model.state_dict(), strict=True)
 
-# 3. Reshpape weights in the PyTorch state dictionary to fit ANE optimized modules
-modified_State_Dict = linear_to_conv2d(torch_Model.state_dict())
-optimized_model.load_state_dict(modified_State_Dict, strict=True)
-print("State Dictionary successfully restored!")
 
-# 4. Remove the final dropout and pooler layers to reveal the last hidden layer sized at [max_Tokens, features(i.e. 768)]
+# 3. Remove the final dropout and pooler layers to reveal the last hidden layer sized at [max_Tokens, features(i.e. 768)]
 torch_Model = torch.nn.Sequential(*(list(torch_Model.children())[:-2])).eval()
 optimized_model = torch.nn.Sequential(*(list(optimized_model.children())[:-2])).eval()
 
@@ -47,11 +43,11 @@ class BS1CtoBSC(torch.nn.Module):
 
 optimized_model = torch.nn.Sequential(*(list(optimized_model.children())), ActivationsOnly(), BS1CtoBSC()).eval()
 
-# 5. Trace the model with dummy inputs to get a TorchScript representation
+# 4. Trace the model with dummy inputs to get a TorchScript representation
 trace_input = {'input': torch.randint(1, 30000, (1, 512), dtype=torch.int64)}
 optimized_trace = torch.jit.trace(optimized_model, example_kwarg_inputs=trace_input)
 
-# 6. Convert the traced model to a Core ML model package and save it to disk
+# 5. Convert the traced model to a Core ML model package and save it to disk
 model = ct.convert(
    optimized_trace,
    source='pytorch',
@@ -75,7 +71,7 @@ model.save('GENA.mlpackage')
 # )
 # model.save('GENA_UNOPT.mlpackage')
 
-# 7. Load the converted model package from disk and verify its predictions
+# 6. Load the converted model package from disk and verify its predictions
 # Mouse collagen col8a1 exon 1, 413 bp (source: GenBank)
 test1_input = 'AGGTGATGGCTGTGCCACCAGGCCCTCTACAGCTGCTGGGAATACTGTTCATCATTTCCCTGAACTCTGTCAGACTCATTCAGGCCGGTGCCTACTATGGAATCAAGCCTCTGCCACCTCAAATCCCTCCTCAGATACCACCACAAATTCCACAGTACCAGCCCTTGGGCCAGCAAGTCCCTCACATGCCTTTGGGCAAAGATGGCCTTTCCATGGGCAAGGAGATGCCTCACATGCAGTATGGCAAAGAGTACCCATACCTCCCCCAATATATGAAGGAAATCCCACCTGTGCCAAGAATGGGCAAGGAAGTGGTGCCCAAAAAAGGCAAAGGTAACATCAATTGAACAGTTTCAAAATAGCTGCTCTCCAGACTTCTAAACTGTAGAAGTTGAGGAGAAAACTATGTAGAC'
 # Guinea pig insulin gene, 1472 bp (source: GenBank)

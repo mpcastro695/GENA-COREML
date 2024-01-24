@@ -1,7 +1,137 @@
 import torch
+from src.modeling_bert import BertEmbeddings, BertIntermediate, BertSelfOutput, BertOutput, BertAttention, BertLayer, BertEncoder, BertModel, BertPooler, BertForSequenceClassification
 
-from BertANE.src.modeling_bert import BertAttention
-from BertANE.Dense import BertSelfOutputANE
+EPS = 1e-7
+
+def linear_to_conv2d(state_dict, prefix=None, local_metadata=None, strict=True, missing_keys=None, unexpected_keys=None, error_msgs=None):
+    """
+     Returns a BERT state_dict where the weights of linear layers are unsqueezed twice to fit
+     their Conv2D, ANE-optimized equivalents.
+    """
+
+    for k in state_dict:
+        is_key = all(substr in k for substr in ['key', '.weight'])
+        is_query = all(substr in k for substr in ['query', '.weight'])
+        is_value = all(substr in k for substr in ['value', '.weight'])
+
+        is_internal_proj = all(substr in k for substr in ['dense', '.weight'])
+        is_output_proj = all(substr in k for substr in ['classifier', '.weight'])
+
+        is_pooler = all(substr in k for substr in ['pooler', '.weight'])
+
+        if is_key or is_query or is_value or is_internal_proj or is_output_proj or is_pooler:
+            print(f'Weights for {k} unsqueezed twice to match data format expected in ANE optimized Conv2d layers')
+            state_dict[k] = torch.unsqueeze(state_dict[k], dim=2).contiguous()
+            state_dict[k] = torch.unsqueeze(state_dict[k], dim=3).contiguous()
+
+def correct_for_bias_scale_order_inversion(state_dict, prefix=None, local_metadata=None, strict=True, missing_keys=None, unexpected_keys=None, error_msgs=None):
+    """
+    Note: torch.nn.LayerNorm and ane_transformers.reference.layer_norm.LayerNormANE
+    apply scale and bias terms in opposite orders. In order to accurately restore a
+    state_dict trained using the former into the the latter, we adjust the bias term
+    """
+
+    if state_dict[prefix + 'bias'] != None and state_dict[prefix + 'bias'] != None:
+        state_dict[prefix + 'bias'] = state_dict[prefix + 'bias'] / state_dict[prefix + 'weight']
+        print(f'Weights for Layer Norm {prefix} Inverted to match data format expected in ANE optimized module')
+
+    return state_dict
+
+class LayerNormANE(torch.nn.Module):
+    """
+    Layer Normalization optimized for Apple Neural Engine (ANE) execution. Please refer to the Apple Machine Learning
+    research paper 'Deploying Transformers on the Apple Neural Engine for the original code.
+    """
+    def __init__(self, num_channels, clip_mag=None, eps=1e-5, elementwise_affine=True):
+        """
+        Args:
+            num_channels:       Number of channels (C) where the expected input data format is BC1S. S stands for sequence length.
+            clip_mag:           Optional float value to use for clamping the input range before layer norm is applied.
+                                If specified, helps reduce risk of overflow.
+            eps:                Small value to avoid dividing by zero
+            elementwise_affine: If true, adds learnable channel-wise shift (bias) and scale (weight) parameters
+        """
+        super().__init__()
+
+        # Principle 1: Picking the Right Data Format (machinelearning.apple.com/research/apple-neural-engine)
+        self.expected_rank = len('BC1S')
+
+        self.num_channels = num_channels
+        self.eps = eps
+        self.clip_mag = clip_mag
+        self.elementwise_affine = elementwise_affine
+
+        if self.elementwise_affine:
+            self.weight = torch.nn.Parameter(torch.Tensor(num_channels))
+            self.bias = torch.nn.Parameter(torch.Tensor(num_channels))
+
+        self._reset_parameters()
+
+    def _reset_parameters(self):
+        if self.elementwise_affine:
+            torch.nn.init.ones_(self.weight)
+            torch.nn.init.zeros_(self.bias)
+
+    def forward(self, inputs):
+        input_rank = len(inputs.size())
+
+        # Principle 1: Picking the Right Data Format (machinelearning.apple.com/research/apple-neural-engine)
+        # Migrate the data format from BSC to BC1S (most conducive to ANE)
+        if input_rank == 3 and inputs.size(2) == self.num_channels:
+            inputs = inputs.transpose(1, 2).unsqueeze(2)
+            input_rank = len(inputs.size())
+
+        # assert input_rank == self.expected_rank
+        # assert inputs.size(1) == self.num_channels
+
+        if self.clip_mag is not None:
+            inputs.clamp_(-self.clip_mag, self.clip_mag)
+
+        channels_mean = inputs.mean(dim=1, keepdims=True)
+        zero_mean = inputs - channels_mean
+        zero_mean_sq = zero_mean * zero_mean
+        denom = (zero_mean_sq.mean(dim=1, keepdims=True) + self.eps).rsqrt()
+        out = zero_mean * denom
+
+        if self.elementwise_affine:
+            out = (out + self.bias.view(1, self.num_channels, 1, 1)
+                   ) * self.weight.view(1, self.num_channels, 1, 1)
+
+        return out
+
+class BertLayerNormANE(LayerNormANE):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Registers the pre_hook to properly restore LayerNorm scale and bias from a pre-trained BERT state dictionary
+        self._register_load_state_dict_pre_hook(correct_for_bias_scale_order_inversion)
+
+class BertEmbeddingsANE(BertEmbeddings):
+    # Hugging Face 4.17 BERT Embedding adapter class
+    def __init__(self, config):
+        super().__init__(config)
+        setattr(self, 'LayerNorm', BertLayerNormANE(num_channels=config.hidden_size, eps=EPS))
+
+class BertIntermediateANE(BertIntermediate):
+    # Hugging Face 4.17 BERT Intermediate adapter class
+    def __init__(self, config):
+        super().__init__(config)
+        self.seq_len_dim = 3
+        setattr(self, 'dense', torch.nn.Conv2d(in_channels=config.hidden_size, out_channels=config.intermediate_size, kernel_size=1))
+
+class BertSelfOutputANE(BertSelfOutput):
+    # Hugging Face 4.17 BERT Self Output adapter class
+    def __init__(self, config):
+        super().__init__(config)
+        self.seq_len_dim = 3
+        setattr(self, 'dense', torch.nn.Conv2d(in_channels=config.hidden_size, out_channels=config.hidden_size, kernel_size=1))
+
+class BertOutputANE(BertOutput):
+    # Hugging Face 4.17 BERT Output adapter class
+    def __init__(self, config):
+        super().__init__(config)
+        self.seq_len_dim = 3
+        setattr(self, 'dense', torch.nn.Conv2d(in_channels=config.intermediate_size, out_channels=config.hidden_size, kernel_size=1))
 
 class SelfAttentionANE(torch.nn.Module):
     """
@@ -129,7 +259,7 @@ class SelfAttentionANE(torch.nn.Module):
         """
 
         # Parse tensor shapes for source and target sequences
-        assert len(q.size()) == 4 and len(k.size()) == 4 and len(v.size()) == 4
+        # assert len(q.size()) == 4 and len(k.size()) == 4 and len(v.size()) == 4
         b, ct, ht, wt = q.size()
         b, cs, hs, ws = k.size()
 
@@ -186,9 +316,7 @@ class SelfAttentionANE(torch.nn.Module):
         return self._forward_impl(q, k, v, **kwargs)
 
 class BertAttentionANE(BertAttention):
-    """
-    BERT Attention optimized for Apple Neural Engine. Compatible w/ huggingface transformers 4.17.0
-    """
+    # Hugging Face 4.17 BERT Attention adapter class
     def __init__(self, config):
         # Initialize the ANE_Attention super class with the embedding dimensions
         ## Sets 'self' attribute to be an instance of ANE_SelfAttention
@@ -207,5 +335,76 @@ class BertAttentionANE(BertAttention):
         return attn_output, attn_weights
 
 
+class BertLayerANE(BertLayer):
+    # Hugging Face 4.17 BERT Layer adapter class
+    def __init__(self, config, has_relative_attention_bias=False):
+        super().__init__(config)
+        self.config = config
+        setattr(self, 'pre_attention_ln', BertLayerNormANE(num_channels=config.hidden_size))
+        setattr(self, 'post_attention_ln', BertLayerNormANE(num_channels=config.hidden_size))
+        setattr(self, 'attention', BertAttentionANE(config))
+        setattr(self, 'intermediate', BertIntermediateANE(config))
+        setattr(self, 'output', BertOutputANE(config))
 
+    def forward(
+        self,
+        hidden_states,
+        attention_mask=None,
+        head_mask=None,
+        encoder_hidden_states=None,
+        encoder_attention_mask=None,
+        past_key_value=None,
+        position_bias=None,
+        output_attentions=False,
+    ):
+        # Normalizes the input and calculates attention w/ ANE-optimized module
+        # Adds it back to the input ('i.e, our 'hidden states')
+        attn, attn_weights = self.attention(hidden_states if not self.pre_layer_norm else self.pre_attention_ln(hidden_states))
+        attn_output = hidden_states + attn
 
+        # Normalizes the output from the attention sublayer and feeds it to the FFN modules
+        intermediate_output = self.intermediate(attn_output if not self.pre_layer_norm else self.post_attention_ln(attn_output))
+        dense_output = self.output(intermediate_output, attn)
+
+        return dense_output + attn_output, attn_weights
+
+class BertEncoderANE(BertEncoder):
+    # Hugging Face 4.17 BERT Encoder adapter class
+    def __init__(self, config):
+        super().__init__(config)
+        setattr(self, 'layer', torch.nn.ModuleList([BertLayerANE(config, has_relative_attention_bias=bool(i == 0)) for i in range(config.num_hidden_layers)]))
+
+class BertPoolerANE(BertPooler):
+    # Hugging Face 4.17 BERT Pooler adapter class
+    def __init__(self, config):
+        super().__init__(config)
+        self.seq_len_dim = 3
+        setattr(self, 'dense', torch.nn.Conv2d(in_channels=config.hidden_size, out_channels=config.hidden_size, kernel_size=1))
+
+    def forward(self, hidden_states):
+        # "Pool" the model by simply taking the hidden state corresponding to the first token.
+        first_token_tensor = hidden_states[0]
+        # pooled_output = self.dense(first_token_tensor)
+        # pooled_output = self.activation(pooled_output)
+        # return pooled_output
+
+        # Weights for the pooler head are randomly initialized
+        return first_token_tensor
+
+class BertModelANE(BertModel):
+    # Hugging Face 4.17 BERT Model adapter class
+    def __init__(self, config):
+        super().__init__(config)
+        setattr(self, 'embeddings', BertEmbeddingsANE(config))
+        setattr(self, 'encoder', BertEncoderANE(config))
+        setattr(self, 'pooler', BertPoolerANE(config))
+
+class BertForSequenceClassificationANE(BertForSequenceClassification):
+    # Hugging Face 4.17 Bert Classification head adapter class
+    def __init__(self, config):
+        super().__init__(config)
+        setattr(self, 'bert', BertModelANE(config))
+        setattr(self, 'classifier', torch.nn.Conv2d(in_channels=config.hidden_size, out_channels=config.num_labels, kernel_size=1))
+
+        # Registers the pre-hook that reshapes linear weights to Conv2D weights
+        self._register_load_state_dict_pre_hook(linear_to_conv2d)
