@@ -31,7 +31,7 @@ def correct_for_bias_scale_order_inversion(state_dict, prefix=None, local_metada
     state_dict trained using the former into the the latter, we adjust the bias term
     """
 
-    if state_dict[prefix + 'bias'] != None and state_dict[prefix + 'bias'] != None:
+    if state_dict[prefix + 'weight'] != None and state_dict[prefix + 'bias'] != None:
         state_dict[prefix + 'bias'] = state_dict[prefix + 'bias'] / state_dict[prefix + 'weight']
         print(f'Weights for Layer Norm {prefix} Inverted to match data format expected in ANE optimized module')
 
@@ -107,7 +107,7 @@ class BertLayerNormANE(LayerNormANE):
         self._register_load_state_dict_pre_hook(correct_for_bias_scale_order_inversion)
 
 class BertEmbeddingsANE(BertEmbeddings):
-    # Hugging Face 4.17 BERT Embedding adapter class
+    # Hugging Face 4.17 BERT Embeddings adapter class
     def __init__(self, config):
         super().__init__(config)
         setattr(self, 'LayerNorm', BertLayerNormANE(num_channels=config.hidden_size, eps=EPS))
