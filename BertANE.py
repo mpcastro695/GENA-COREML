@@ -1,8 +1,6 @@
 import torch
 from src.modeling_bert import BertEmbeddings, BertIntermediate, BertSelfOutput, BertOutput, BertAttention, BertLayer, BertEncoder, BertModel, BertPooler, BertForSequenceClassification
 
-EPS = 1e-7
-
 def linear_to_conv2d(state_dict, prefix=None, local_metadata=None, strict=True, missing_keys=None, unexpected_keys=None, error_msgs=None):
     """
      Returns a BERT state_dict where the weights of linear layers are unsqueezed twice to fit
@@ -35,7 +33,6 @@ def correct_for_bias_scale_order_inversion(state_dict, prefix=None, local_metada
         state_dict[prefix + 'bias'] = state_dict[prefix + 'bias'] / state_dict[prefix + 'weight']
         print(f'Weights for Layer Norm {prefix} Inverted to match data format expected in ANE optimized module')
 
-    return state_dict
 
 class LayerNormANE(torch.nn.Module):
     """
@@ -110,7 +107,7 @@ class BertEmbeddingsANE(BertEmbeddings):
     # Hugging Face 4.17 BERT Embeddings adapter class
     def __init__(self, config):
         super().__init__(config)
-        setattr(self, 'LayerNorm', BertLayerNormANE(num_channels=config.hidden_size, eps=EPS))
+        setattr(self, 'LayerNorm', BertLayerNormANE(num_channels=config.hidden_size, eps=config.layer_norm_eps))
 
 class BertIntermediateANE(BertIntermediate):
     # Hugging Face 4.17 BERT Intermediate adapter class
@@ -125,13 +122,16 @@ class BertSelfOutputANE(BertSelfOutput):
         super().__init__(config)
         self.seq_len_dim = 3
         setattr(self, 'dense', torch.nn.Conv2d(in_channels=config.hidden_size, out_channels=config.hidden_size, kernel_size=1))
+        if not self.pre_layer_norm:
+            setattr(self, 'LayerNorm', BertLayerNormANE(num_channels=config.hidden_size, eps=config.layer_norm_eps))
 
 class BertOutputANE(BertOutput):
     # Hugging Face 4.17 BERT Output adapter class
     def __init__(self, config):
         super().__init__(config)
-        self.seq_len_dim = 3
         setattr(self, 'dense', torch.nn.Conv2d(in_channels=config.intermediate_size, out_channels=config.hidden_size, kernel_size=1))
+        if not self.pre_layer_norm:
+            setattr(self, 'LayerNorm', BertLayerNormANE(num_channels=config.hidden_size, eps=config.layer_norm_eps))
 
 class SelfAttentionANE(torch.nn.Module):
     """
@@ -334,14 +334,14 @@ class BertAttentionANE(BertAttention):
 
         return attn_output, attn_weights
 
-
 class BertLayerANE(BertLayer):
     # Hugging Face 4.17 BERT Layer adapter class
     def __init__(self, config, has_relative_attention_bias=False):
         super().__init__(config)
         self.config = config
-        setattr(self, 'pre_attention_ln', BertLayerNormANE(num_channels=config.hidden_size))
-        setattr(self, 'post_attention_ln', BertLayerNormANE(num_channels=config.hidden_size))
+        if self.pre_layer_norm:
+            setattr(self, 'pre_attention_ln', BertLayerNormANE(num_channels=config.hidden_size))
+            setattr(self, 'post_attention_ln', BertLayerNormANE(num_channels=config.hidden_size))
         setattr(self, 'attention', BertAttentionANE(config))
         setattr(self, 'intermediate', BertIntermediateANE(config))
         setattr(self, 'output', BertOutputANE(config))
@@ -357,16 +357,21 @@ class BertLayerANE(BertLayer):
         position_bias=None,
         output_attentions=False,
     ):
-        # Normalizes the input and calculates attention w/ ANE-optimized module
-        # Adds it back to the input ('i.e, our 'hidden states')
+        # Normalizes the input (pre-layer norm only) and calculates attention w/ ANE-optimized module
+        # Adds it back to the input (pre-layer norm only)
         attn, attn_weights = self.attention(hidden_states if not self.pre_layer_norm else self.pre_attention_ln(hidden_states))
-        attn_output = hidden_states + attn
+        attn_output = attn
+        if self.pre_layer_norm:
+            attn_output = hidden_states + attn
 
-        # Normalizes the output from the attention sublayer and feeds it to the FFN modules
+        # Normalizes the output (pre-layer norm only) from the attention sublayer and feeds it to the FFN modules
+        # Adds it back to the FFN output (pre-layer norm only)
         intermediate_output = self.intermediate(attn_output if not self.pre_layer_norm else self.post_attention_ln(attn_output))
         dense_output = self.output(intermediate_output, attn)
+        if self.pre_layer_norm:
+            dense_output = dense_output + attn_output
 
-        return dense_output + attn_output, attn_weights
+        return dense_output, attn_weights
 
 class BertEncoderANE(BertEncoder):
     # Hugging Face 4.17 BERT Encoder adapter class
@@ -388,16 +393,15 @@ class BertPoolerANE(BertPooler):
         # pooled_output = self.activation(pooled_output)
         # return pooled_output
 
-        # Weights for the pooler head are randomly initialized
         return first_token_tensor
 
 class BertModelANE(BertModel):
     # Hugging Face 4.17 BERT Model adapter class
-    def __init__(self, config):
+    def __init__(self, config, add_pooling_layer=True):
         super().__init__(config)
         setattr(self, 'embeddings', BertEmbeddingsANE(config))
         setattr(self, 'encoder', BertEncoderANE(config))
-        setattr(self, 'pooler', BertPoolerANE(config))
+        setattr(self, 'pooler', BertPoolerANE(config) if add_pooling_layer else None)
 
 class BertForSequenceClassificationANE(BertForSequenceClassification):
     # Hugging Face 4.17 Bert Classification head adapter class
