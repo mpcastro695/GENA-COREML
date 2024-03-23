@@ -3,7 +3,7 @@ from src.modeling_bert import BertEmbeddings, BertIntermediate, BertSelfOutput, 
 
 def linear_to_conv2d(state_dict, prefix=None, local_metadata=None, strict=True, missing_keys=None, unexpected_keys=None, error_msgs=None):
     """
-     Returns a BERT state_dict where the weights of linear layers are unsqueezed twice to fit
+     Returns a state_dict where the weights of linear layers are unsqueezed twice to fit
      their Conv2D, ANE-optimized equivalents.
     """
 
@@ -24,9 +24,8 @@ def linear_to_conv2d(state_dict, prefix=None, local_metadata=None, strict=True, 
 
 def correct_for_bias_scale_order_inversion(state_dict, prefix=None, local_metadata=None, strict=True, missing_keys=None, unexpected_keys=None, error_msgs=None):
     """
-    Note: torch.nn.LayerNorm and ane_transformers.reference.layer_norm.LayerNormANE
-    apply scale and bias terms in opposite orders. In order to accurately restore a
-    state_dict trained using the former into the the latter, we adjust the bias term
+    Returns a state_dict with adjusted bias terms for ANE-optimized layer normalization; torch.nn.LayerNorm and ane_transformers.reference.layer_norm.LayerNormANE
+    apply scale and bias terms in opposite orders.
     """
 
     if state_dict[prefix + 'weight'] != None and state_dict[prefix + 'bias'] != None:
@@ -37,7 +36,7 @@ def correct_for_bias_scale_order_inversion(state_dict, prefix=None, local_metada
 class LayerNormANE(torch.nn.Module):
     """
     Layer Normalization optimized for Apple Neural Engine (ANE) execution. Please refer to the Apple Machine Learning
-    research paper 'Deploying Transformers on the Apple Neural Engine for the original code.
+    research paper 'Deploying Transformers on the Apple Neural Engine' for the original code.
     """
     def __init__(self, num_channels, clip_mag=None, eps=1e-5, elementwise_affine=True):
         """
@@ -135,8 +134,8 @@ class BertOutputANE(BertOutput):
 
 class SelfAttentionANE(torch.nn.Module):
     """
-    Self Attention optimized for efficient ANE deployment. Please refer to the Apple Machine Learning
-    research paper 'Deploying Transformers on the Apple Neural Engine for the original code.'
+    Self Attention optimized for Apple Neural Engine (ANE) execution. Please refer to the Apple Machine Learning
+    research paper 'Deploying Transformers on the Apple Neural Engine' for the original code.
     """
     def __init__(self, embed_dim, d_qk=None, d_v=None, d_out=None, n_head=8, dropout=0.1, **kwargs):
         """
@@ -253,9 +252,6 @@ class SelfAttentionANE(torch.nn.Module):
 
         Note: If any of q,k,v has shape (batch_size, embed_dim, height, width) that represent a 2-d feature map, this will
         be flattened to (batch_size, embed_dim, 1, height * width)
-
-        Note: `attn_weights` are never passed downstream even when return_weights=True because all the attn_weights
-        are harvested from the outermost module (e.g. ane_transformers.model#Transformer) by means of forward hooks
         """
 
         # Parse tensor shapes for source and target sequences

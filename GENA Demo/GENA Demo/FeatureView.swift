@@ -22,10 +22,11 @@ struct FeatureView: View {
                 Text("Features")
                     .font(.title)
                     .bold()
-                Text("Sequence length: \(tokenizer.tokenCount - 2)")
+                Text("Sequence length: \(tokenizer.tokenCount - 1)")
             }
             .foregroundColor(.secondary)
-            .padding()
+            .padding(.top)
+            .padding(.horizontal)
             ScrollView(.horizontal){
                 LazyHGrid(rows: singleRow) {
                     ForEach(Array(getTokenSlices(for: result, tokenCount: tokenizer.tokenCount).enumerated()), id: \.offset) { index, tokenSlice in
@@ -36,9 +37,10 @@ struct FeatureView: View {
                                 .bold()
                             Text("Index: \(index)")
                         }
+                        .padding(.horizontal, 15)
                     }
-                }.frame(minHeight: 500)
-            }
+                }
+            }.frame(minHeight: 270)
         }
     }
     
@@ -70,12 +72,13 @@ struct FeatureView: View {
 
 struct Features2DVisual: View {
     
-    let gridSize = CGSize(width: 10, height: 10)
-    let spacing: CGFloat = 4
+    let gridSize = CGSize(width: 6, height: 6)
+    let spacing: CGFloat = 2
+    let lineWidth: CGFloat = 0.2
     let height = 32
-    let width = 24 // 768 features per token
-    let posLimit: Double = 12
-    let negLimit: Double = -12
+    let width = 24 // height * width = 768 features per token
+    let posLimit: Double = 6
+    let negLimit: Double = -6
     
     let values: [Float32]
     
@@ -91,17 +94,20 @@ struct Features2DVisual: View {
                 
                 //Calculate cell color
                 let value = values[i]
-                if value >= 0 { // Shade Green
+                if value > Float32(posLimit){ // Shade Green
+                    let color = Color.green
+                    context.fill(rectPath, with: .color(color))
+                }else if value >= 0 { // Shade Green
                     let color = Color.green.opacity(Double(value)/posLimit)
                     context.fill(rectPath, with: .color(color))
-                }else if value < -12{ // Shade gray
-                    let color = Color.gray.opacity(0.3)
+                }else if value < Float32(negLimit){ // Shade red
+                    let color = Color.red
                     context.fill(rectPath, with: .color(color))
                 }else{ // Shade red
                     let color = Color.red.opacity(Double(value)/negLimit)
                     context.fill(rectPath, with: .color(color))
                 }
-                context.stroke(rectPath, with: .color(.secondary), lineWidth: 1)
+                context.stroke(rectPath, with: .color(.secondary), lineWidth: lineWidth)
                 
                 // Increment position, L -> R, T -> B
                 x += 1
@@ -111,8 +117,7 @@ struct Features2DVisual: View {
                 }
             }
         }
-        .frame(width:350, height: 450)
-        .padding(.horizontal, 15)
+        .frame(width:200, height: 270)
     }
 }
 

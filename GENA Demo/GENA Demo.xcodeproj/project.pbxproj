@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E83186BA2B5DCB23001573DD /* GENA.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = E83186B92B5DCB23001573DD /* GENA.mlpackage */; };
+		E849D45C2C4CEABC00A96A32 /* GENA_FP16.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = E849D45B2C4CEABC00A96A32 /* GENA_FP16.mlpackage */; };
 		E86D328229EA1FC100B6A880 /* GENA_DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E86D328129EA1FC100B6A880 /* GENA_DemoApp.swift */; };
 		E86D328629EA1FC200B6A880 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E86D328529EA1FC200B6A880 /* Assets.xcassets */; };
 		E86D328929EA1FC200B6A880 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E86D328829EA1FC200B6A880 /* Preview Assets.xcassets */; };
@@ -18,7 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		E83186B92B5DCB23001573DD /* GENA.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = GENA.mlpackage; sourceTree = "<group>"; };
+		E849D45B2C4CEABC00A96A32 /* GENA_FP16.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = GENA_FP16.mlpackage; sourceTree = "<group>"; };
 		E86D327E29EA1FC100B6A880 /* GENA Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GENA Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E86D328129EA1FC100B6A880 /* GENA_DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GENA_DemoApp.swift; sourceTree = "<group>"; };
 		E86D328529EA1FC200B6A880 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -60,9 +60,9 @@
 		E86D328029EA1FC100B6A880 /* GENA Demo */ = {
 			isa = PBXGroup;
 			children = (
-				E83186B92B5DCB23001573DD /* GENA.mlpackage */,
 				E88ADDED2B4111D400C28A52 /* BPTokenizer.swift */,
 				E86D328129EA1FC100B6A880 /* GENA_DemoApp.swift */,
+				E849D45B2C4CEABC00A96A32 /* GENA_FP16.mlpackage */,
 				E86D329029EA1FE900B6A880 /* FeatureView.swift */,
 				E86D32AF2A00E06900B6A880 /* ContentView.swift */,
 				E86D329829EA242B00B6A880 /* vocab.json */,
@@ -154,8 +154,8 @@
 			files = (
 				E86D329129EA1FE900B6A880 /* FeatureView.swift in Sources */,
 				E86D32B02A00E06900B6A880 /* ContentView.swift in Sources */,
-				E83186BA2B5DCB23001573DD /* GENA.mlpackage in Sources */,
 				E88ADDEE2B4111D400C28A52 /* BPTokenizer.swift in Sources */,
+				E849D45C2C4CEABC00A96A32 /* GENA_FP16.mlpackage in Sources */,
 				E86D328229EA1FC100B6A880 /* GENA_DemoApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

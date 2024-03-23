@@ -1,4 +1,6 @@
-GENA.mlpackage/
+GENA_FP16.mlpackage/
+GENA_FP32.mlpackage/
 GENA_UNOPT.mlpackage/
 GENA.pth
 __pycache__/
+.idea/

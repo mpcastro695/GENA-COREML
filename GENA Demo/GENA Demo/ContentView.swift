@@ -10,7 +10,7 @@ import CoreML
 
 struct ContentView: View {
     
-    let model = try! GENA()
+    let model = try! GENA_FP16()
     @StateObject var tokenizer = BPTokenizer.loadTokenizer()!
     
     @State private var entry = String()
@@ -55,6 +55,7 @@ struct ContentView: View {
                     guard let output = try? model.prediction(input_ids: encodedInput) else {
                             fatalError("Unexpected runtime error.")
                     }
+                    print(output.features.shape)
                     results.append(output.features)
                 } label: {
                     Text("Extract Features")
@@ -66,7 +67,7 @@ struct ContentView: View {
                 FeatureView(result: result, tokenizer: tokenizer)
             }
         }
-        .frame(minWidth: 800, minHeight: 600)
+        .frame(minWidth: 600, minHeight: 480)
         .environmentObject(tokenizer)
     }
     

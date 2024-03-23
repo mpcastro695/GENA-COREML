@@ -68,16 +68,16 @@ class BPTokenizer: Decodable, ObservableObject {
         }
         tokens = Array(tokens.prefix(BPTokenizer.maxTokens-BPTokenizer.overheadTokens))
         tokens.insert("[CLS]", at: 0)
-        tokens.append("[SEP]")
-        var vocabIDs = tokens.compactMap{vocab[$0]}
         
         tokenSequence = tokens
-        tokenCount = vocabIDs.count
-        print(tokenCount)
+        tokenCount = tokens.count
         
-        // Fill the remaining token id slots with padding
-        let padding = BPTokenizer.maxTokens - tokenCount
-        vocabIDs += Array(repeating: 0, count: padding)
+        tokens.append("[SEP]")
+        // Fill remaining slots with padding tokens
+        let padding = BPTokenizer.maxTokens - tokens.count
+        tokens += Array(repeating: "[PAD]", count: padding)
+        
+        let vocabIDs = tokens.compactMap{vocab[$0]}
         
         return MLShapedArray(scalars: vocabIDs.compactMap{Int32($0)}, shape: [1, BPTokenizer.maxTokens])
     }
