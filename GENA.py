@@ -73,18 +73,26 @@ test_input = tokenizer(test_input, return_tensors='pt', max_length=512, padding=
 with torch.no_grad():
     torch_output = torch_model(test_input['input_ids'])
 
-# Inference with Core ML model
-model = ct.models.model.MLModel('GENA_FP16.mlpackage')
-prediction = model.predict({'input_ids': test_input['input_ids'].type('torch.FloatTensor')})
-coreML_tensor = prediction.get('features')
+# Inference with Core ML models
+model_f32 = ct.models.model.MLModel('GENA_FP32.mlpackage')
+prediction_f32 = model_f32.predict({'input_ids': test_input['input_ids'].type('torch.FloatTensor')})
+core32_tensor = prediction_f32.get('features')
+
+model_f16 = ct.models.model.MLModel('GENA_FP16.mlpackage')
+prediction_f16 = model_f16.predict({'input_ids': test_input['input_ids'].type('torch.FloatTensor')})
+core16_tensor = prediction_f16.get('features')
 
 # Extract torch tensors
 torch_tensor = torch_output.detach().cpu().numpy() if torch_output[0].requires_grad else torch_output[0].cpu().numpy()
 torch_tensor = np.squeeze(torch_tensor)
 
-# Compare the output activations (usually falling within the range of -10 to +10)
-relTolerance = 1e+02
-absTolerance = 1e-01
+# Compare the output activations
+relTolerance = 1e-02
+absTolerance = 1e-03
+np.testing.assert_allclose(core32_tensor, torch_tensor, relTolerance, absTolerance)
+print("Congrats on the new FP32 model!")
 
-np.testing.assert_allclose(coreML_tensor, torch_tensor, relTolerance, absTolerance)
-print("Congrats on the new model!")
+relTolerance = 2e+01
+absTolerance = 1e-01
+np.testing.assert_allclose(core16_tensor, torch_tensor, relTolerance, absTolerance)
+print("Congrats on the new FP16 model!")

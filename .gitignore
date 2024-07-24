@@ -4,3 +4,4 @@ GENA_UNOPT.mlpackage/
 GENA.pth
 __pycache__/
 .idea/
+.DS_Store/
