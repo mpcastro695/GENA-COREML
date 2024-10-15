@@ -40,7 +40,7 @@ struct FeatureView: View {
                         .padding(.horizontal, 15)
                     }
                 }
-            }.frame(minHeight: 270)
+            }.frame(minHeight: 240)
         }
     }
     
@@ -117,7 +117,7 @@ struct Features2DVisual: View {
                 }
             }
         }
-        .frame(width:200, height: 270)
+        .frame(width:200, height: 240)
     }
 }
 

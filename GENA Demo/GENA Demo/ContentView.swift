@@ -67,7 +67,7 @@ struct ContentView: View {
                 FeatureView(result: result, tokenizer: tokenizer)
             }
         }
-        .frame(minWidth: 600, minHeight: 480)
+        .frame(minWidth: 600, minHeight: 420)
         .environmentObject(tokenizer)
     }
     

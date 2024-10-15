@@ -48,6 +48,8 @@ print(output.features)
 ```
 The output is a 2D [MLMultiArray](https://developer.apple.com/documentation/coreml/mlmultiarray) of size [maxTokens, features], i.e., [512, 768]. Please refer to the `GENA Demo` project for more details on using the converted model.
 
+![Alt text](<GENA Demo/GENA Demo/Assets.xcassets/Features.imageset/ScreenshotA.png>)
+
 ## Optimizations
 Following guidance from this [paper](https://machinelearning.apple.com/research/neural-engine-transformers), the following changes were made prior to conversion:
 - Linear (dense) layers were replaced with their 2D convolution equivalent
@@ -60,5 +62,5 @@ Weights were reshaped to match the layer changes by registering pre-hooks, per t
 
 The conversion script has two options for compute precision: a 32-bit floating point (full-precision) model for execution on the GPU, and a 16-bit floating point (half-precision) model for execution on the ANE. By default, both model packages are saved to disk.
 
+![Alt text](<GENA Demo/GENA Demo/Assets.xcassets/FP16Report_MacOS.imageset/FP16Report_MacOS.PNG>)
 
-![Alt text](<GENA Demo/GENA Demo/Assets.xcassets/Features.imageset/Screenshot.png>)
